@@ -1,27 +1,21 @@
 import { useQuery } from "@apollo/client";
 import { GET_PHOTOS } from "../graphql/queries";
+import { IPhoto } from "../types/photos";
 
 interface GetPhotoOptions {
   searchString: string;
   page: number;
 }
 
-interface Photo {
-  id: number;
-  title: string;
-  thumbnailUrl: string;
-  url: string;
-}
-
-interface Photos {
-  data: Photo[];
+export interface IPhotoData {
+  data: IPhoto[];
   meta: { totalCount: number };
 }
 
 export const usePhotos = ({ searchString, page }: GetPhotoOptions) => {
   const itemsPerPage = 5;
   const { loading, error, data } = useQuery<{
-    photos: Photos;
+    photos: IPhotoData;
   }>(GET_PHOTOS, {
     variables: {
       options: {

@@ -2,13 +2,18 @@ import { useState, useMemo } from "react";
 import { Autocomplete, Box, Pagination, Stack, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
+import Link from "@mui/material/Link";
+import Dialog from "../components/Dialog";
 import Table from "../components/Table";
+import { IPhoto } from "../types/photos";
 import { usePhotos } from "../hooks";
 
 const IndexPage = () => {
   const [page, setPage] = useState(1);
   const [input, setInput] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<IPhoto | undefined>();
 
   const { photos, pageCount, loading, error } = usePhotos({
     searchString: searchQuery,
@@ -20,15 +25,31 @@ const IndexPage = () => {
     setPage(1);
   };
 
+  const handleSelectedPhoto = (photo: IPhoto) => {
+    setSelectedPhoto(photo);
+    setIsModalOpen(true);
+  };
+
   const tableRows = useMemo(
     () =>
       photos?.map((photo) => ({
         rowId: photo.id,
         rowItems: [
-          photo.id,
+          <Link
+            component="button"
+            variant="body2"
+            onClick={() => handleSelectedPhoto(photo)}
+          >
+            {photo.id}
+          </Link>,
           photo.title,
-          <Box sx={{ ":hover": { cursor: "pointer" }, display: "flex" }}>
-            <img src={photo.thumbnailUrl} alt={photo.title} loading="lazy" />
+          <Box sx={{ ":hover": { cursor: "pointer" } }}>
+            <img
+              src={photo.thumbnailUrl}
+              alt={photo.title}
+              loading="lazy"
+              onClick={() => handleSelectedPhoto(photo)}
+            />
           </Box>,
         ],
       })),
@@ -84,6 +105,17 @@ const IndexPage = () => {
         !loading &&
         !error && <Box sx={{ alignSelf: "center" }}>No results found</Box>
       )}
+      <Dialog
+        isOpen={isModalOpen}
+        handleClose={() => setIsModalOpen(false)}
+        contentSx={{ padding: 0, height: 600 }}
+      >
+        <img
+          src={selectedPhoto?.url}
+          alt={selectedPhoto?.title}
+          loading="lazy"
+        />
+      </Dialog>
     </Stack>
   );
 };
