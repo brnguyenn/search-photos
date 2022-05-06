@@ -1,4 +1,5 @@
 import { useQuery } from "@apollo/client";
+import { calculatePageCount } from "../components/utils/photos";
 import { GET_PHOTOS } from "../graphql/queries";
 import { IPhoto } from "../types/photos";
 
@@ -31,8 +32,6 @@ export const usePhotos = ({ searchString, page }: GetPhotoOptions) => {
     photos: photos?.data,
     loading: loading,
     error: error,
-    pageCount: photos?.meta.totalCount
-      ? Math.ceil(photos?.meta.totalCount / 5)
-      : 0,
+    pageCount: calculatePageCount(photos?.meta.totalCount ?? 0, itemsPerPage),
   };
 };
